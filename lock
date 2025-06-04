@@ -1,0 +1,132 @@
+#!/bin/bash
+
+
+
+
+
+#Colors
+RED='\e[31m'
+YELLOW='\e[33m'
+GREEN='\e[32m'
+NC='\e[0m' 
+
+
+
+
+
+
+
+function Helper {
+    echo -e "${YELLOW} This script performs straightforward file encryption using OpenSSL. ${NC}"
+    echo -e "${GREEN}        usage: lock path/to/plain-file ${NC} "
+    echo -e "${YELLOW} An encrypted file will be created in the same directory as the input file, with the same name and a .enc extension. ${NC}"
+}
+
+
+
+
+#step 1 (check if there is an argument )
+function CheckArgument {
+    if [[ -z "$1" ]]; then
+        echo -e "${RED} Error: First Argument is mandatory ${NC}"
+        echo -e "--------------------------------\n"
+        Helper
+        exit 1
+    fi
+}
+
+CheckArgument $1
+
+plainTextFile=$1
+
+#echo "$plainTextFile" for debugging
+
+
+#step 2 (check if file exist)
+
+function CheckExistance {
+    if [[ ! -e "$1" ]]; then
+    echo -e "${RED} Error: file or dir doesn't exist ${NC}"
+    echo -e "--------------------------------\n"
+    Helper
+    exit 1
+    fi
+}
+CheckExistance $plainTextFile
+
+
+#step 2.5 check if file is readable
+function CheckReadable {
+    if [[ ! -r "$1" ]]; then
+    echo -e "${RED} Error: file or dir does not have any read permissions ${NC}"
+    echo -e "--------------------------------\n"
+    Helper
+    exit 1
+    fi
+}
+
+CheckReadable $plainTextFile
+
+
+#check that the dir that contains the file is writeable
+
+
+
+
+#step 3 take the password from user
+
+#dk might  make --pass
+#want to make this so minimal so it can even run on routers
+
+function CheckPassword {
+    if [[ $1 != $2 ]]; then
+    echo -e "${RED} Error: Confirmation Doesn't Match The entered Password ${NC}"
+    echo -e "--------------------------------\n"
+    Helper
+    exit 1
+    fi
+}
+
+read -sp "Enter Password: " password
+echo " "
+read -sp "Confirm Password: " confirming
+echo " "
+CheckPassword $password $confirming
+
+
+
+
+
+
+
+
+#step 4 encryption
+isDir=0
+
+#step 4.1 take md5sum of password
+
+
+# Get MD5 hash
+md5_hash=$(echo -n "$password" | md5sum | awk '{print $1}')
+
+#step 4.2 check if dir  or not
+
+
+
+# if file
+
+if [[ -f $plainTextFile ]];then
+    echo -e "${YELLOW}Encrypting The File ... ${NC}"
+    openssl enc -aes-256-cbc -pbkdf2 -in "$plainTextFile" -out "${plainTextFile}.enc" -pass pass:"${md5sum}"
+    if [[ $? -eq 0 ]]; then
+        echo -e "${GREEN}Encryption successful!${NC}"
+    else
+        echo -e "${RED}Encryption failed!${NC}"
+        exit 1
+    fi
+fi
+
+
+
+#openssl enc -aes-256-cbc -pbkdf2 -in secret.txt -out secret.enc
+#openssl enc -aes-256-cbc -pbkdf2 -in file.txt -out file.txt.enc -pass pass:yourPasswordHere 
