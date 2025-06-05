@@ -148,7 +148,7 @@ else
     plainTextDir="$plainTextFile"
     archive_name="${plainTextDir}.tar.gz"
     encrypted_file="${archive_name}.enc"
-    tar -czf "$archive_name" "$plainTextDir"
+    tar -czf "$archive_name" "$plainTextDir" > /dev/null 2>&1
     if [[ $? != 0 ]]; then
         echo -e "${RED} Error: compressing Your Dir failed for some unknown reason ${NC}"
         exit 1

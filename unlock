@@ -114,7 +114,7 @@ if [[ -f $encryptedFile ]];then
 
         if [[ "$decryptedFile" == *.tar.gz ]]; then
             echo -e "${YELLOW} The Original file was a directory  decompressing archive ${NC}"
-            tar -xzf "${decryptedFile}"
+            tar -xzf "${decryptedFile}" > /dev/null 2>&1
             if [[ $? != 0 ]]; then
                 echo -e "${RED} Error: can't decompress file for some unknown reason"
                 exit 1
@@ -122,7 +122,7 @@ if [[ -f $encryptedFile ]];then
 
 
             echo -e "${YELLOW}Removing the encrypted file!${NC}"
-            rm "$encryptedFile"
+            rm "$encryptedFile" > /dev/null 2>&1
             if [[ $? != 0 ]]; then 
                 echo -e "${RED} Error: can't remove the encrypted file Please remove it yourself"
                 exit 1
@@ -130,7 +130,7 @@ if [[ -f $encryptedFile ]];then
 
 
             echo -e "${YELLOW}Removing the tar archive!${NC}"
-            rm "$decryptedFile"
+            rm "$decryptedFile" > /dev/null 2>&1
             if [[ $? != 0 ]]; then 
                 echo -e "${RED} Error: can't remove the tar archive Please remove it yourself"
                 exit 1
@@ -143,7 +143,7 @@ if [[ -f $encryptedFile ]];then
         else
 
             echo -e "${YELLOW}Removing the encrypted file!${NC}"
-            rm "$encryptedFile"
+            rm "$encryptedFile" > /dev/null 2>&1
             if [[ $? != 0 ]]; then 
                 echo -e "${RED} Error: can't remove the encrypted file Please remove it yourself"
             exit 1
