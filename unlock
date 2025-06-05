@@ -1,1 +1,162 @@
 #!/bin/bash
+
+
+
+#Colors
+RED='\e[31m'
+YELLOW='\e[33m'
+GREEN='\e[32m'
+NC='\e[0m' 
+
+
+
+function Helper {
+    echo -e "${YELLOW} This script is used for decryption , it is meant to be used after the lock command. ${NC}"
+    echo -e "${GREEN}        usage: unlock path/to/encrypted-file ${NC} "
+    echo -e "${YELLOW} The decrypted file will be created in the same directory as the input file. ${NC}"
+}
+
+
+#step 1 (check if there is an argument )
+function CheckArgument {
+    if [[ -z "$1" ]]; then
+        echo -e "${RED} Error: First Argument is mandatory ${NC}"
+        echo -e "--------------------------------\n"
+        Helper
+        exit 1
+    fi
+}
+
+CheckArgument $1
+
+encryptedFile=$1
+
+
+#step 2 (check if file exist)
+
+function CheckExistance {
+    if [[ ! -e "$1" ]]; then
+    echo -e "${RED} Error: file or dir doesn't exist ${NC}"
+    echo -e "--------------------------------\n"
+    Helper
+    exit 1
+    fi
+}
+CheckExistance $encryptedFile
+
+
+
+#step 2.5 check if file is readable
+
+
+
+
+function CheckReadable {
+    if [[ ! -r "$1" ]]; then
+    echo -e "${RED} Error: file or dir does not have any read permissions ${NC}"
+    echo -e "--------------------------------\n"
+    Helper
+    exit 1
+    fi
+}
+
+CheckReadable $encryptedFile
+
+
+
+#step 2.6
+#check that the dir that contains the file is writeable
+
+function CheckWriteable {
+    if [[ ! -w "$1" ]]; then
+    echo -e "${RED} Error: the Directory the contains the file is not writeable ${NC}"
+    echo -e "--------------------------------\n"
+    Helper
+    exit 1
+    fi
+}
+
+
+dir_path="$(dirname "$encryptedFile")"
+CheckWriteable $dir_path
+
+
+
+#step 3 take the password from user
+
+#dk might  make --pass
+#want to make this so minimal so it can even run on routers
+
+
+read -sp "Enter Password: " password
+echo " "
+
+
+#step 4 encryption
+
+
+#step 4.1 take md5sum of password
+
+# Get MD5 hash
+md5_hash=$(echo -n "$password" | md5sum | awk '{print $1}')
+
+
+
+
+if [[ -f $encryptedFile ]];then
+    echo -e "${YELLOW}Decrypting The File ... ${NC}"
+    decryptedFile="${encryptedFile%.enc}"
+    openssl enc -aes-256-cbc -pbkdf2 -d -in "${encryptedFile}" -out "${decryptedFile}" -pass pass:"${md5_hash}" > /dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
+        echo -e "${GREEN}Decryption successful!${NC}"
+        echo -e "${GREEN}Wrote file ${decryptedFile} ${NC}"
+        
+
+        if [[ "$decryptedFile" == *.tar.gz ]]; then
+            echo -e "${YELLOW} The Original file was a directory  decompressing archive ${NC}"
+            tar -xzf "${decryptedFile}"
+            if [[ $? != 0 ]]; then
+                echo -e "${RED} Error: can't decompress file for some unknown reason"
+                exit 1
+            fi
+
+
+            echo -e "${YELLOW}Removing the encrypted file!${NC}"
+            rm "$encryptedFile"
+            if [[ $? != 0 ]]; then 
+                echo -e "${RED} Error: can't remove the encrypted file Please remove it yourself"
+                exit 1
+            fi
+
+
+            echo -e "${YELLOW}Removing the tar archive!${NC}"
+            rm "$decryptedFile"
+            if [[ $? != 0 ]]; then 
+                echo -e "${RED} Error: can't remove the tar archive Please remove it yourself"
+                exit 1
+            fi
+
+
+
+
+            echo -e "${GREEN} Finished all tasks ${NC}"
+        else
+
+            echo -e "${YELLOW}Removing the encrypted file!${NC}"
+            rm "$encryptedFile"
+            if [[ $? != 0 ]]; then 
+                echo -e "${RED} Error: can't remove the encrypted file Please remove it yourself"
+            exit 1
+            fi
+
+            echo -e "${GREEN} Finished all tasks ${NC}"
+            exit 0
+        fi
+
+    else
+        echo -e "${RED}Decryption failed Wrong password!${NC}"
+        exit 1
+    fi
+
+
+fi

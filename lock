@@ -39,7 +39,7 @@ CheckArgument $1
 
 plainTextFile=$1
 
-#echo "$plainTextFile" for debugging
+
 
 
 #step 2 (check if file exist)
@@ -56,6 +56,10 @@ CheckExistance $plainTextFile
 
 
 #step 2.5 check if file is readable
+
+
+
+
 function CheckReadable {
     if [[ ! -r "$1" ]]; then
     echo -e "${RED} Error: file or dir does not have any read permissions ${NC}"
@@ -67,10 +71,21 @@ function CheckReadable {
 
 CheckReadable $plainTextFile
 
-
+#step 2.6
 #check that the dir that contains the file is writeable
 
+function CheckWriteable {
+    if [[ ! -w "$1" ]]; then
+    echo -e "${RED} Error: the Directory the contains the file is not writeable ${NC}"
+    echo -e "--------------------------------\n"
+    Helper
+    exit 1
+    fi
+}
 
+
+dir_path="$(dirname "$plainTextFile")"
+CheckWriteable $dir_path
 
 
 #step 3 take the password from user
@@ -101,29 +116,61 @@ CheckPassword $password $confirming
 
 
 #step 4 encryption
-isDir=0
+
 
 #step 4.1 take md5sum of password
-
 
 # Get MD5 hash
 md5_hash=$(echo -n "$password" | md5sum | awk '{print $1}')
 
-#step 4.2 check if dir  or not
 
 
-
-# if file
 
 if [[ -f $plainTextFile ]];then
     echo -e "${YELLOW}Encrypting The File ... ${NC}"
-    openssl enc -aes-256-cbc -pbkdf2 -in "$plainTextFile" -out "${plainTextFile}.enc" -pass pass:"${md5sum}"
+    encrypted_file="${plainTextFile}.enc"
+    openssl enc -aes-256-cbc -pbkdf2 -in "${plainTextFile}" -out "${encrypted_file}" -pass pass:"${md5_hash}" >/dev/null 2>&1
     if [[ $? -eq 0 ]]; then
         echo -e "${GREEN}Encryption successful!${NC}"
+        echo -e "${GREEN}Wrote file to ${encrypted_file} ${NC}"
+        echo -e "${YELLOW}Removing the original file!${NC}"
+        rm "$plainTextFile"
+        if [[ $? != 0 ]]; then 
+            echo -e "${RED} Error: can't remove the plainText file Please remove it yourself"
+            exit 1
+        fi
+    else
+        echo -e "${RED}Encryption failed !${NC}"
+        exit 1
+    fi
+else 
+    echo -e "${YELLOW}This is a Directory compressing then encrypting ... ${NC}"
+    plainTextDir="$plainTextFile"
+    archive_name="${plainTextDir}.tar.gz"
+    encrypted_file="${archive_name}.enc"
+    tar -czf "$archive_name" "$plainTextDir"
+    if [[ $? != 0 ]]; then
+        echo -e "${RED} Error: compressing Your Dir failed for some unknown reason ${NC}"
+        exit 1
+    fi
+    openssl enc -aes-256-cbc -pbkdf2 -in "${archive_name}" -out "${encrypted_file}" -pass pass:"${md5_hash}" > /dev/null 2>&1
+
+
+    if [[ $? -eq 0 ]]; then
+        echo -e "${GREEN}Encryption successful!${NC}"
+        echo -e "${YELLOW}Removing the tar file!${NC}"
+        echo -e "${GREEN}Wrote file to ${encrypted_file} ${NC}"
+        echo -e "${YELLOW}Note: We didn't remove the original directory please remove it yourself${NC}"
+        rm "$archive_name"
+        if [[ $? != 0 ]]; then 
+            echo -e "${RED} Error: can't remove the archive  Please remove it yourself"
+            exit 1
+        fi
     else
         echo -e "${RED}Encryption failed!${NC}"
         exit 1
     fi
+
 fi
 
 
