@@ -53,6 +53,6 @@ sudo cp ./lock ./unlock "$TARGET_DIR/" > /dev/null 2>&1
 if [[ $? -eq 0 ]]; then
     echo -e "${GREEN}Successfully installed 'lock' and 'unlock' to $TARGET_DIR ${NC}"
 else
-    echo -e "${RED} Failed to copy scripts. Do you have sudo permissions?${NC}"
+    echo -e "${RED}Failed to copy scripts. Do you have sudo permissions?${NC}"
     exit 1
 fi
