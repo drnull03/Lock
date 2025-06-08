@@ -113,10 +113,10 @@ if [[ -f $encryptedFile ]];then
         
 
         if [[ "$decryptedFile" == *.tar.gz ]]; then
-            echo -e "${YELLOW} The Original file was a directory  decompressing archive ${NC}"
+            echo -e "${YELLOW}The Original file was a directory  decompressing archive ${NC}"
             tar -xzf "${decryptedFile}" > /dev/null 2>&1
             if [[ $? != 0 ]]; then
-                echo -e "${RED} Error: can't decompress file for some unknown reason"
+                echo -e "${RED}Error: can't decompress file for some unknown reason"
                 exit 1
             fi
 
@@ -124,7 +124,7 @@ if [[ -f $encryptedFile ]];then
             echo -e "${YELLOW}Removing the encrypted file!${NC}"
             rm "$encryptedFile" > /dev/null 2>&1
             if [[ $? != 0 ]]; then 
-                echo -e "${RED} Error: can't remove the encrypted file Please remove it yourself"
+                echo -e "${RED}Error: can't remove the encrypted file Please remove it yourself"
                 exit 1
             fi
 
@@ -132,24 +132,24 @@ if [[ -f $encryptedFile ]];then
             echo -e "${YELLOW}Removing the tar archive!${NC}"
             rm "$decryptedFile" > /dev/null 2>&1
             if [[ $? != 0 ]]; then 
-                echo -e "${RED} Error: can't remove the tar archive Please remove it yourself"
+                echo -e "${RED}Error: can't remove the tar archive Please remove it yourself"
                 exit 1
             fi
 
 
 
 
-            echo -e "${GREEN} Finished all tasks ${NC}"
+            echo -e "${GREEN}Finished all tasks ${NC}"
         else
 
             echo -e "${YELLOW}Removing the encrypted file!${NC}"
             rm "$encryptedFile" > /dev/null 2>&1
             if [[ $? != 0 ]]; then 
-                echo -e "${RED} Error: can't remove the encrypted file Please remove it yourself"
+                echo -e "${RED}Error: can't remove the encrypted file Please remove it yourself"
             exit 1
             fi
 
-            echo -e "${GREEN} Finished all tasks ${NC}"
+            echo -e "${GREEN}Finished all tasks ${NC}"
             exit 0
         fi
 

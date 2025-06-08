@@ -36,7 +36,7 @@ fi
 
 TARGET_DIR="/usr/local/bin"
 
-echo -e "${YELLOW}\n Installing lock and unlock scripts to $TARGET_DIR...${NC}"
+echo -e "${YELLOW}Installing lock and unlock scripts to $TARGET_DIR...${NC}"
 
 # Check if scripts exist in current directory
 if [[ ! -f ./lock || ! -f ./unlock ]]; then
