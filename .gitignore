@@ -2,3 +2,4 @@
 /secretDir/
 /secret.txt.enc
 /Lock/
+**/*.enc
