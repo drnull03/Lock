@@ -146,6 +146,10 @@ if [[ -f $plainTextFile ]];then
 else 
     echo -e "${YELLOW}This is a Directory compressing then encrypting ... ${NC}"
     plainTextDir="$plainTextFile"
+    if [[ "$plainTextDir" == */ ]]; then
+       plainTextDir="${plainTextDir%/}"
+       echo $plainTextDir
+    fi
     archive_name="${plainTextDir}.tar.gz"
     encrypted_file="${archive_name}.enc"
     tar -czf "$archive_name" "$plainTextDir" > /dev/null 2>&1
