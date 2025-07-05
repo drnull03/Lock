@@ -7,7 +7,7 @@ YELLOW='\e[33m'
 NC='\e[0m' 
 
 # Required 
-REQUIRED_TOOLS=("awk" "openssl" "tar")
+REQUIRED_TOOLS=("awk" "openssl" "tar","shred")
 
 echo -e "${YELLOW}Checking required tools...${NC}"
 

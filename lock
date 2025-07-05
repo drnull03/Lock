@@ -134,7 +134,7 @@ if [[ -f $plainTextFile ]];then
         echo -e "${GREEN}Encryption successful!${NC}"
         echo -e "${GREEN}Wrote file to ${encrypted_file} ${NC}"
         echo -e "${YELLOW}Removing the original file!${NC}"
-        rm "$plainTextFile"
+        shred -uz "$plainTextFile"
         if [[ $? != 0 ]]; then 
             echo -e "${RED}Error: can't remove the plainText file Please remove it yourself"
             exit 1
@@ -168,7 +168,7 @@ else
        # echo -e "${YELLOW}Note: We didn't remove the original directory please remove it yourself${NC}"
        #dk might make a question for removal
         echo -e "${YELLOW}trying tp remove the tar file!${NC}"
-        rm "$archive_name"
+        shred -uz "$archive_name"
         if [[ $? != 0 ]]; then 
             echo -e "${RED}Error: can't remove the archive  Please remove it yourself"
             exit 1
